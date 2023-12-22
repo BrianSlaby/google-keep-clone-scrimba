@@ -16,6 +16,7 @@ class App {
         this.$modalTitle = document.querySelector(".modal-title")
         this.$modalText = document.querySelector(".modal-text")
         this.$modalCloseButton = document.querySelector(".modal-close-button")
+        this.$colorTooltip = document.querySelector("#color-tooltip")
 
         this.addEventListeners()
     }
@@ -25,6 +26,29 @@ class App {
             this.handleFormClick(event)
             this.selectNote(event)
             this.openModal(event)
+        })
+        
+        document.body.addEventListener("mouseover", event => {
+            this.openTooltip(event)
+        })
+
+        document.body.addEventListener("mouseout", event => {
+            this.closeTooltip(event)
+        })
+
+        this.$colorTooltip.addEventListener("mouseover", function() {
+            this.style.display = "flex"
+        })
+
+        this.$colorTooltip.addEventListener("mouseout", function() {
+            this.style.display = "none"
+        })
+
+        this.$colorTooltip.addEventListener("click", event => {
+            const color = event.target.dataset.color
+            if (color) {
+                this.editNoteColor(color)
+            }
         })
 
         this.$form.addEventListener("submit", event => {
@@ -89,6 +113,22 @@ class App {
         this.$modal.classList.toggle("open-modal")
     }
 
+    openTooltip(event) {
+        if (!event.target.matches(".toolbar-color")) return
+        this.id = event.target.dataset.id
+        const noteCoords = event.target.getBoundingClientRect()
+        const horizontal = noteCoords.left + window.scrollX
+        //const vertical = noteCoords.top + window.scrollY
+        const vertical = window.scrollY - 25
+        this.$colorTooltip.style.transform = `translate(${horizontal}px, ${vertical}px)`
+        this.$colorTooltip.style.display = "flex"
+    }
+
+    closeTooltip(event) {
+        if (!event.target.matches(".toolbar-color")) return
+        this.$colorTooltip.style.display = "none"
+    }
+
     addNote({ title, text }) {
         const newNote = {
             title,
@@ -115,6 +155,17 @@ class App {
         this.displayNotes()
     }
 
+    editNoteColor(color) {
+        this.notes = this.notes.map(note => {
+            if (note.id === Number(this.id)) {
+                return { ... note, color }
+            } else {
+                return note
+            }
+        })
+        this.displayNotes()
+    }
+
     selectNote(event) {
         const $selectedNote = event.target.closest(".note")
         if (!$selectedNote) return
@@ -131,13 +182,15 @@ class App {
 
         // REFACTOR WITH CREATE ELEMENT
         this.$notes.innerHTML = this.notes.map(note => {
+
+            // palette icon and delete icon
             return `
             <div style="background: ${note.color}" class="note" data-id=${note.id}>
                 <div class="${note.title && 'note-title'}">${note.title}</div>
                 <div class="note-text">${note.text}</div>
                 <div class="toolbar-container">
                 <div class="toolbar">
-                    <img class="toolbar-color" src="">
+                    <img class="toolbar-color" data-id=${note.id} src="">
                     <img class="toolbar-delete" src="">
                 </div>
                 </div>
