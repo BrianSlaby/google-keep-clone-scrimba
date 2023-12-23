@@ -22,6 +22,10 @@ class App {
         this.addEventListeners()
     }
 
+// ============================================
+//            EVENT LISTENERS
+// ============================================
+
     addEventListeners() {
         document.body.addEventListener("click", event => {
             this.handleFormClick(event)
@@ -73,6 +77,10 @@ class App {
             this.closeModal(event)
         })
     }
+
+// ============================================
+//                UI METHODS
+// ============================================
 
     handleFormClick(event) {
         const isFormClicked = this.$form.contains(event.target)
@@ -130,6 +138,10 @@ class App {
         if (!event.target.matches(".toolbar-color")) return
         this.$colorTooltip.style.display = "none"
     }
+
+// ============================================
+//           NOTE SPECIFIC METHODS
+// ============================================
 
     addNote({ title, text }) {
         const newNote = {
@@ -194,29 +206,85 @@ class App {
         localStorage.setItem("notes", JSON.stringify(this.notes))
     }
 
+// ============================================
+//         CREATE ELEMENT METHODS
+// ============================================
+
+    createToolbarColor(note) {
+        const icon = document.createElement("img")
+        icon.src = `assets/palette-solid.svg`
+        icon.classList.add("toolbar-color")
+        icon.dataset.id = note.id
+
+        return icon
+    }
+
+    createToolbarDelete(note) {
+        const icon = document.createElement("img")
+        icon.src = `assets/trash-solid.svg`
+        icon.classList.add("toolbar-delete")
+        icon.dataset.id = note.id
+
+        return icon
+    }
+
+    createToolbar(note) {
+        const toolbar = document.createElement("div")
+        toolbar.classList.add("toolbar")
+        toolbar.appendChild(this.createToolbarColor(note))
+        toolbar.appendChild(this.createToolbarDelete(note))
+
+        return toolbar
+    }
+
+    createToolbarContainer(note) {
+        const container = document.createElement("div")
+        container.classList.add("toolbar-container")
+        container.appendChild(this.createToolbar(note))
+
+        return container
+    }
+
+    createNoteTitle(note) {
+        const noteTitle = document.createElement("div")
+        noteTitle.classList.add(`${note.title && 'note-title'}`)
+        noteTitle.textContent = note.title
+
+        return noteTitle
+    }
+
+    createNoteText(note) {
+        const noteText = document.createElement("div")
+        noteText.classList.add("note-text")
+        noteText.textContent = note.text
+
+        return noteText
+    }
+
+    createNoteEl(note) {
+        const noteEl = document.createElement("div")
+        noteEl.classList.add("note")
+        noteEl.dataset.id = note.id
+        noteEl.style.background = note.color
+        noteEl.appendChild(this.createNoteTitle(note))
+        noteEl.appendChild(this.createNoteText(note))
+        noteEl.appendChild(this.createToolbarContainer(note))
+
+        return noteEl
+    }
+
+// ============================================
+//       displayNotes uses above methods
+// ============================================
+
     displayNotes() {
         const hasNotes = this.notes.length > 0
 
         this.$placeholder.style.display = hasNotes ? "none" : "flex"
 
-        // REFACTOR WITH CREATE ELEMENT
-        this.$notes.innerHTML = this.notes.map(note => {
-
-            return `
-            <div style="background: ${note.color}" class="note" data-id=${note.id}>
-                <div class="${note.title && 'note-title'}">${note.title}</div>
-                <div class="note-text">${note.text}</div>
-                <div class="toolbar-container">
-                <div class="toolbar">
-                    <img class="toolbar-color" data-id=${note.id} src="assets/palette-solid.svg"/>
-                    
-                    <img class="toolbar-delete" data-id=${note.id} src="assets/trash-solid.svg"/>
-                    
-                </div>
-                </div>
-            </div>
-            `
-        }).join("")
+        const notesHTML = this.notes.map(note => this.createNoteEl(note))
+        this.$notes.innerHTML = ''
+        this.$notes.append(...notesHTML)
     }
 
     clearFormFields() {
