@@ -2,18 +2,18 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:400,500&display=swap">
-
+    
         <link rel="stylesheet" href="style.css">
 
         <title>Google Keep Clone</title>
+
+        <script src="https://kit.fontawesome.com/2756cba595.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <div class="modal">
             <div class="modal-content">
                 <input class="modal-title" placeholder="Title" type="text">
                 <input class="modal-text" placeholder="Take a note..." type="text">
-                <!-- Why isn't this a button element? -->
-                <!-- I'll continue as is, and refactor if it still doesn't make sense -->
                 <span class="modal-close-button">Close</span>
             </div>
         </div>
@@ -35,7 +35,7 @@
             </div>
             <div id="notes"></div>
             <div id="placeholder">
-                <img id="placeholder-logo" src="">
+                <img id="placeholder-logo" src="assets/note-sticky-regular.svg">
                 <p id="placeholder-text">Notes you add appear here</p>
             </div>
 
@@ -46,6 +46,7 @@
                 <div class="color-option" data-color="#a7ffeb" id="teal"></div>
             </div>
         </main>
+
         <script src="app.js"></script>
     </body>
 </html>

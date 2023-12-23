@@ -1,6 +1,6 @@
 class App {
     constructor() {
-        this.notes = []
+        this.notes = JSON.parse(localStorage.getItem("notes")) || []
         this.title = ""
         this.text = ""
         this.id = ""
@@ -18,6 +18,7 @@ class App {
         this.$modalCloseButton = document.querySelector(".modal-close-button")
         this.$colorTooltip = document.querySelector("#color-tooltip")
 
+        this.render()
         this.addEventListeners()
     }
 
@@ -120,7 +121,6 @@ class App {
         this.id = event.target.dataset.id
         const noteCoords = event.target.getBoundingClientRect()
         const horizontal = noteCoords.left + window.scrollX
-        //const vertical = noteCoords.top + window.scrollY
         const vertical = window.scrollY - 25
         this.$colorTooltip.style.transform = `translate(${horizontal}px, ${vertical}px)`
         this.$colorTooltip.style.display = "flex"
@@ -140,7 +140,7 @@ class App {
         }
 
         this.notes = [...this.notes, newNote]
-        this.displayNotes()
+        this.render()
         this.closeForm()
     }
 
@@ -154,7 +154,7 @@ class App {
                 return note
             }
         })
-        this.displayNotes()
+        this.render()
     }
 
     editNoteColor(color) {
@@ -165,7 +165,7 @@ class App {
                 return note
             }
         })
-        this.displayNotes()
+        this.render()
     }
 
     selectNote(event) {
@@ -182,7 +182,16 @@ class App {
         if (!event.target.matches(".toolbar-delete")) return
         const id = event.target.dataset.id
         this.notes = this.notes.filter(note => note.id !== Number(id))
+        this.render()
+    }
+
+    render() {
+        this.saveNotes()
         this.displayNotes()
+    }
+
+    saveNotes() {
+        localStorage.setItem("notes", JSON.stringify(this.notes))
     }
 
     displayNotes() {
@@ -193,15 +202,16 @@ class App {
         // REFACTOR WITH CREATE ELEMENT
         this.$notes.innerHTML = this.notes.map(note => {
 
-            // palette icon and trash can icon
             return `
             <div style="background: ${note.color}" class="note" data-id=${note.id}>
                 <div class="${note.title && 'note-title'}">${note.title}</div>
                 <div class="note-text">${note.text}</div>
                 <div class="toolbar-container">
                 <div class="toolbar">
-                    <img class="toolbar-color" data-id=${note.id} src="">
-                    <img class="toolbar-delete" data-id=${note.id} src="">
+                    <img class="toolbar-color" data-id=${note.id} src="assets/palette-solid.svg"/>
+                    
+                    <img class="toolbar-delete" data-id=${note.id} src="assets/trash-solid.svg"/>
+                    
                 </div>
                 </div>
             </div>
